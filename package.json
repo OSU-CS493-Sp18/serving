@@ -1,0 +1,35 @@
+{
+  "name": "serving",
+  "version": "1.0.0",
+  "description": "Serving with Node.js and Express",
+  "main": "server.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "dependencies": {
+    "express": "^4.16.3",
+    "figlet": "^1.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.17.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "serving",
+    "express",
+    "apis"
+  ],
+  "author": "Rob Hess <hessro@oregonstate.edu>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OSU-CS493-Sp18/serving.git"
+  },
+  "bugs": {
+    "url": "https://github.com/OSU-CS493-Sp18/serving/issues"
+  },
+  "homepage": "https://github.com/OSU-CS493-Sp18/serving#readme"
+}
