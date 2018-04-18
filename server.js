@@ -8,6 +8,8 @@ var lodgings = require('./lodgings');
 
 app.use(bodyParser.json());
 
+app.use(express.static('public'));
+
 app.use(logger);
 
 app.get('/', function (req, res, next) {
