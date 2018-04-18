@@ -3,13 +3,8 @@
   "info": {
     "version": "1.0.0",
     "title": "Book-a-Place API",
-    "description": "A simple API for an Airbnb-like application.\n"
+    "description": "A simple API for an Airbnb-like application."
   },
-  "servers": [
-    {
-      "url": "http://localhost:8000"
-    }
-  ],
   "paths": {
     "/lodgings": {
       "get": {
@@ -41,13 +36,23 @@
                   "properties": {
                     "pageNumber": {
                       "type": "integer",
-                      "description": "The current page of lodgings.",
+                      "description": "Page number of returned lodgings.",
                       "example": 1
                     },
                     "totalPages": {
                       "type": "integer",
-                      "description": "Total pages of lodgings.",
+                      "description": "Total number of pages available.",
                       "example": 127
+                    },
+                    "pageSize": {
+                      "type": "integer",
+                      "description": "Number of lodgings per page.",
+                      "example": 10
+                    },
+                    "totalCount": {
+                      "type": "integer",
+                      "description": "Total number of lodgings.",
+                      "example": 1264
                     },
                     "lodgings": {
                       "type": "array",
@@ -64,9 +69,9 @@
         }
       },
       "post": {
-        "summary": "Create a new lodging.",
-        "description": "Creates a new lodging with specified data.\n",
-        "operationId": "createLodging",
+        "summary": "Add a new lodging",
+        "description": "Creates a new lodging with specified data and adds it to the application's database.\n",
+        "operationId": "addNewLodging",
         "tags": [
           "lodgings"
         ],
@@ -82,7 +87,7 @@
         },
         "responses": {
           "201": {
-            "description": "Success",
+            "description": "New lodging successfully added",
             "content": {
               "application/json": {
                 "schema": {
@@ -90,8 +95,7 @@
                   "properties": {
                     "id": {
                       "type": "integer",
-                      "format": "int64",
-                      "description": "ID of the created lodging.",
+                      "description": "Unique ID of the created lodging.",
                       "example": 12345
                     }
                   }
@@ -100,7 +104,7 @@
             }
           },
           "400": {
-            "description": "Incorrectly-formatted request body.",
+            "description": "Incorrectly-formatted request body",
             "content": {
               "application/json": {
                 "schema": {
@@ -117,19 +121,117 @@
         {
           "name": "lodgingID",
           "in": "path",
-          "description": "ID of the lodging.",
+          "description": "Unique ID of a lodging.",
           "schema": {
             "type": "integer"
           },
+          "example": 12345,
           "required": true
         }
-      ]
+      ],
+      "get": {
+        "summary": "Fetch data for a specific lodging.",
+        "description": "Returns complete data for a the lodging specified by `lodgingID`.\n",
+        "operationId": "getLodging",
+        "tags": [
+          "lodgings"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Lodging"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Specified `lodgingID` not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update data for a specific lodging.",
+        "description": "Replaces the data for the lodging specified by `lodgingID`.\n",
+        "operationId": "replaceLodging",
+        "tags": [
+          "lodgings"
+        ],
+        "requestBody": {
+          "description": "Lodging data to replace data for the lodging specified by `lodgingID`.\n",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Lodging"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "Incorrectly-formatted request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Specified `lodgingID` not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove a specific lodging from the database.",
+        "description": "Completely removes the data for the lodging specified by `lodgingID`.\n",
+        "operationId": "removeLodging",
+        "tags": [
+          "lodgings"
+        ],
+        "responses": {
+          "204": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Specified `lodgingID` not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
       "Lodging": {
-        "description": "An object representing a single lodging.\n",
+        "description": "An object representing information about a single lodging.\n",
         "type": "object",
         "properties": {
           "name": {
@@ -140,11 +242,11 @@
           "description": {
             "type": "string",
             "description": "Textual description of the lodging.",
-            "example": "Nice place to stay, down by the river."
+            "example": "This is a nice place to stay, right downtown and near the river."
           },
           "price": {
             "type": "number",
-            "description": "Price per night of the lodging.",
+            "description": "Price of the lodging, per night, in USD.",
             "example": 128,
             "minimum": 0.01
           }
@@ -155,15 +257,21 @@
         ]
       },
       "Error": {
-        "description": "Object representing an API error.\n",
+        "description": "An object representing an error response from the API.\n",
         "type": "object",
         "properties": {
           "err": {
             "type": "string",
-            "description": "Error message."
+            "description": "A message describing the error."
           }
         }
       }
     }
-  }
+  },
+  "tags": [
+    {
+      "name": "lodgings",
+      "description": "API endpoints related to lodgings resources\n"
+    }
+  ]
 }
